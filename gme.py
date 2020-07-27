@@ -4,12 +4,13 @@ import sys
 import pygame
 import random
 
-from ui import Gem, Ship, Enemy
+from ui import Gem, Ship, Enemy, Msg
 
 # global variables
 screen = None
 enemy = None
 gem = None
+msg = None
 
 # key - hero, value - probability (part of total sum, not percent)
 heroes = {'knight': 6, 'archer': 6, 'mage': 6, 
@@ -33,13 +34,45 @@ class Set:
     bg_color = (120, 0, 60)
     screen = None
 
+class Player:
+    gems = 5
+    own_heroes = []
 
-# FUNCTIONS --------------------------------------------------------------------a
+# FUNCTIONS --------------------------------------------------------------------
 
 # we pass max value in our range (our summ of all probabilities)
 def rand(summ):
     rv = random.randrange(0, summ, 1)    # range from 1 to our summ, with step 1
     return rv
+
+def get_hero():
+    global heroes
+    global msg
+
+    h_values = heroes.values()
+    h_sum = sum(h_values)
+    r = rand(h_sum)
+    current_sum = 0
+    for key, value in heroes.items():
+        current_sum += value
+        if (r < current_sum):
+            print(key, '->', current_sum, 'random:', r)
+            hero_name = key
+            Player.own_heroes.append(hero_name)         # add hero to player's own list of heroes
+            msg = Msg(screen, hero_name)
+            print('Now you have in collection:', Player.own_heroes)
+            break
+
+# gem click
+def check_gem_clicked(gem, mouse_x, mouse_y):
+    if gem.rect.collidepoint(mouse_x, mouse_y):
+        print('[Gem clicked]')
+        if Player.gems > 0:
+            Player.gems -= 1
+            get_hero()
+            print('Opened a gem. Gems remained:', Player.gems)
+        else:
+            print('No more gems to open!')
 
 
 # init func --------------------------------------------------------------------
@@ -60,23 +93,33 @@ def init():
     enemy = Enemy(screen)
     gem = Gem(screen)
 
-
 # main loop --------------------------------------------------------------------
 def run():
     global screen
     global enemy
     global gem
+    global msg
 
     # main loop
     while True:
         # events processing
         for event in pygame.event.get():
+            # keys
             if event.type == pygame.QUIT:
                 sys.exit()
+            # mouse
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                check_gem_clicked(gem, mouse_x, mouse_y)
+
         # screen redraw
         screen.fill(Set.bg_color)
+
         enemy.draw()
         gem.draw()
+        if (msg):
+            msg.draw()
+
         pygame.display.flip()
 
 
@@ -94,10 +137,9 @@ if __name__ == "__main__":
     # print available heroes
     print(heroes)
 
+    '''
     while (i < 100):
         r = rand(h_sum)
-        #print('rand value is:', r)
-        # go through dict to find our hero
         current_sum = 0
         for key, value in heroes.items():
             current_sum += value
@@ -105,8 +147,9 @@ if __name__ == "__main__":
                 print(key, '->', current_sum, 'random:', r)
                 break
         i += 1
-    # end randomizer -----
-
-
+    '''
     run()
-    
+
+
+
+
