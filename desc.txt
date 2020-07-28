@@ -1,4 +1,4 @@
 1. Click on gem - receive hero			\/
 2. Display messages on screen			\/
-3. Count of gems - display
-4. Display all heroes collection on screen under tag: Team
+3. Count of gems - display			\/
+4. Display all heroes in collection on screen under tag: Team

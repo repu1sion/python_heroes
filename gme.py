@@ -4,13 +4,16 @@ import sys
 import pygame
 import random
 
-from ui import Gem, Ship, Enemy, Msg
+from ui import Gem, Ship, Enemy, Msg, Label
 
 # global variables
 screen = None
 enemy = None
 gem = None
 msg = None
+label_gems = None
+label_gems_cnt = None
+label_team = None
 
 # key - hero, value - probability (part of total sum, not percent)
 heroes = {'knight': 6, 'archer': 6, 'mage': 6, 
@@ -65,10 +68,13 @@ def get_hero():
 
 # gem click
 def check_gem_clicked(gem, mouse_x, mouse_y):
+    global label_gems_cnt 
+
     if gem.rect.collidepoint(mouse_x, mouse_y):
         print('[Gem clicked]')
         if Player.gems > 0:
             Player.gems -= 1
+            label_gems_cnt = Label(screen, str(Player.gems), 150, 20, 16, (241, 196, 15))
             get_hero()
             print('Opened a gem. Gems remained:', Player.gems)
         else:
@@ -80,6 +86,9 @@ def init():
     global screen
     global enemy
     global gem
+    global label_gems
+    global label_gems_cnt 
+    global label_team
 
     print("init()")
     # randomizer init
@@ -92,6 +101,9 @@ def init():
     # game objects init
     enemy = Enemy(screen)
     gem = Gem(screen)
+    label_gems = Label(screen, 'Gems:', 100, 20, 16, (241, 196, 15))
+    label_gems_cnt = Label(screen, str(Player.gems), 150, 20, 16, (241, 196, 15))
+    label_team = Label(screen, 'TEAM', 100, 200, 16, (241, 196, 15))
 
 # main loop --------------------------------------------------------------------
 def run():
@@ -99,6 +111,9 @@ def run():
     global enemy
     global gem
     global msg
+    global label_gems
+    global label_gems_cnt 
+    global label_team
 
     # main loop
     while True:
@@ -117,6 +132,9 @@ def run():
 
         enemy.draw()
         gem.draw()
+        label_gems.draw()
+        label_gems_cnt.draw()
+        label_team.draw()
         if (msg):
             msg.draw()
 
