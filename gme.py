@@ -14,9 +14,10 @@ msg = None
 label_gems = None
 label_gems_cnt = None
 label_team = None
+labels_heroes = []
 
 # key - hero, value - probability (part of total sum, not percent)
-heroes = {'knight': 6, 'archer': 6, 'mage': 6, 
+heroes = {'knight': 100, 'archer': 6, 'mage': 6, 
           'grunt': 6, 'berserk': 6, 'shaman': 6,
           'puma': 6, 'archeress': 6, 'druid': 6,
           'skeleton': 6, 'skeleton_archer': 6, 'acolyte': 6,
@@ -30,6 +31,20 @@ heroes = {'knight': 6, 'archer': 6, 'mage': 6,
           'nerzul': 1, 'gorgoroth': 1
 }
 
+class knight:
+    def __init__(self):
+        self.hp = 1000
+        self.atk_min = 40
+        self.atk_max = 70
+        self.dfn = 30
+        self.special = 'Power Shot'
+        self.special_atk = 120
+        self.special_cd = 3
+        self.active_cd = 0
+        self.lvl = 1
+        self.max_lvl = 40
+
+
 # class without objects, keeps settings
 class Set:
     d_width = 1024
@@ -40,6 +55,8 @@ class Set:
 class Player:
     gems = 5
     own_heroes = []
+    own_heroes_cnt = 0
+    heroes_objects = []
 
 # FUNCTIONS --------------------------------------------------------------------
 
@@ -50,7 +67,7 @@ def rand(summ):
 
 def get_hero():
     global heroes
-    global msg
+    global labels_heroes
 
     h_values = heroes.values()
     h_sum = sum(h_values)
@@ -61,8 +78,16 @@ def get_hero():
         if (r < current_sum):
             print(key, '->', current_sum, 'random:', r)
             hero_name = key
+            # create hero object
+            if (hero_name == 'knight'):
+                hero = knight()
+                Player.heroes_objects.append(hero)
+                print('knight created!')
+
             Player.own_heroes.append(hero_name)         # add hero to player's own list of heroes
-            msg = Msg(screen, hero_name)
+            Player.own_heroes_cnt += 1
+            msg = Label(screen, str(hero_name), 100, 200 + Player.own_heroes_cnt *25, 16, (241, 196, 15))
+            labels_heroes.append(msg)
             print('Now you have in collection:', Player.own_heroes)
             break
 
@@ -114,6 +139,7 @@ def run():
     global label_gems
     global label_gems_cnt 
     global label_team
+    global labels_heroes
 
     # main loop
     while True:
@@ -137,6 +163,8 @@ def run():
         label_team.draw()
         if (msg):
             msg.draw()
+        for l in labels_heroes:
+            l.draw()
 
         pygame.display.flip()
 
